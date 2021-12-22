@@ -51,6 +51,8 @@ jobs:
       - uses: bahmutov/npm-install@v1.1.0
       - name: Build native packages
         run: yarn build-release
+        env:
+          CFLAGS: -std=c99
       - name: Strip debug symbols # https://github.com/rust-lang/rust/issues/46034
         run: strip ./*.node
       - name: Upload artifacts
