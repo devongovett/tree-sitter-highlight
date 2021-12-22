@@ -1,8 +1,8 @@
 {
   "name": "tree-sitter-highlight",
   "version": "1.0.0",
-  "description": "A node API for the dprint TypeScript and JavaScript code formatter",
-  "repository": "https://github.com/devongovett/dprint-node",
+  "description": "A syntax highlighter for Node powered by Tree Sitter. Written in Rust.",
+  "repository": "https://github.com/devongovett/tree-sitter-highlight",
   "author": "Devon Govett <devongovett@gmail.com>",
   "license": "MIT",
   "napi": {
