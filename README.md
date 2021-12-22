@@ -20,6 +20,42 @@ treeSitter.highlightHast('const foo = "hi";', treeSitter.Language.JS);
 // => {type: 'element', children: [...]}
 ```
 
+## Themes
+
+The output HTML will contain CSS class names for various tokens. These will depend on the language, but there are several common names used across languages. Here is a basic example theme:
+
+```css
+.keyword {
+  color: purple;
+}
+
+.function {
+  color: blue;
+}
+
+.type {
+  color: pink;
+}
+
+.string {
+  color: green;
+}
+
+.number {
+  color: brown;
+}
+
+.operator {
+  color: gray;
+}
+
+.comment {
+  color: lightgray;
+}
+```
+
+Inspect the generated output HTML and design your CSS accordingly.
+
 ## License
 
 MIT
