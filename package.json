@@ -1,0 +1,27 @@
+{
+  "name": "tree-sitter-highlight",
+  "version": "1.0.0",
+  "description": "A node API for the dprint TypeScript and JavaScript code formatter",
+  "repository": "https://github.com/devongovett/dprint-node",
+  "author": "Devon Govett <devongovett@gmail.com>",
+  "license": "MIT",
+  "napi": {
+    "name": "tree-sitter-highlight"
+  },
+  "files": [
+    "*.node",
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "build": "napi build --platform",
+    "build-release": "napi build --platform --release"
+  },
+  "dependencies": {
+    "detect-libc": "^1.0.3",
+    "tiny-benchy": "^2.1.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.0.0"
+  }
+}

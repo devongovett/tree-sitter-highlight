@@ -1,0 +1,24 @@
+[package]
+name = "node-tree-sitter-highlight"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+
+[dependencies]
+tree-sitter-highlight = "0.20"
+tree-sitter-javascript = "0.20"
+tree-sitter-typescript = "0.20"
+tree-sitter-css = { git = "https://github.com/devongovett/tree-sitter-css" }
+napi = "2"
+napi-derive = "2"
+lazy_static = "1.4"
+
+[build-dependencies]
+napi-build = { version = "1" }
+
+[profile.release]
+opt-level = 3
+lto = true
