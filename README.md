@@ -1,6 +1,6 @@
 # tree-sitter-highlight
 
-A syntax highlighter for Node.js powered by [Tree Sitter](https://github.com/tree-sitter/tree-sitter).
+A syntax highlighter for Node.js powered by [Tree Sitter](https://github.com/tree-sitter/tree-sitter). Written in Rust.
 
 ## Usage
 
