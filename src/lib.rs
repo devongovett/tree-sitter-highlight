@@ -26,8 +26,8 @@ lazy_static! {
   };
 
   static ref JSX_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
-    let mut highlights = tree_sitter_javascript::HIGHLIGHT_QUERY.to_owned();
-    highlights.push_str(tree_sitter_javascript::JSX_HIGHLIGHT_QUERY);
+    let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
+    highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
 
     let mut config = HighlightConfiguration::new(
       tree_sitter_javascript::language(),
@@ -59,8 +59,8 @@ lazy_static! {
   };
 
   static ref TSX_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
-    let mut highlights = tree_sitter_typescript::HIGHLIGHT_QUERY.to_owned();
-    highlights.push_str(tree_sitter_javascript::JSX_HIGHLIGHT_QUERY);
+    let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
+    highlights.push_str(tree_sitter_typescript::HIGHLIGHT_QUERY);
     highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
 
     let mut locals = tree_sitter_typescript::LOCALS_QUERY.to_owned();
