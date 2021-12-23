@@ -2,6 +2,7 @@ use tree_sitter_highlight::{Highlighter, HighlightConfiguration, HtmlRenderer, H
 use napi_derive::napi;
 use napi::bindgen_prelude::*;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 
 #[napi]
 pub enum Language {
@@ -13,7 +14,7 @@ pub enum Language {
 }
 
 lazy_static! {
-  static ref JS_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
+  static ref JS_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>, HashMap<&'static str, HighlightConfiguration>) = {
     let mut config = HighlightConfiguration::new(
       tree_sitter_javascript::language(),
       tree_sitter_javascript::HIGHLIGHT_QUERY,
@@ -21,11 +22,11 @@ lazy_static! {
       tree_sitter_javascript::LOCALS_QUERY,
     ).unwrap();
 
-    let (html_attrs, class_names) = get_highlight_names(&mut config);
-    (config, html_attrs, class_names)
+    let (injections, html_attrs, class_names) = build_config_with_regex(&mut config);
+    (config, html_attrs, class_names, injections)
   };
 
-  static ref JSX_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
+  static ref JSX_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>, HashMap<&'static str, HighlightConfiguration>) = {
     let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
     highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
 
@@ -36,11 +37,11 @@ lazy_static! {
       tree_sitter_javascript::LOCALS_QUERY,
     ).unwrap();
 
-    let (html_attrs, class_names) = get_highlight_names(&mut config);
-    (config, html_attrs, class_names)
+    let (injections, html_attrs, class_names) = build_config_with_regex(&mut config);
+    (config, html_attrs, class_names, injections)
   };
 
-  static ref TS_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
+  static ref TS_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>, HashMap<&'static str, HighlightConfiguration>) = {
     let mut highlights = tree_sitter_typescript::HIGHLIGHT_QUERY.to_owned();
     highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
 
@@ -54,11 +55,11 @@ lazy_static! {
       &locals,
     ).unwrap();
 
-    let (html_attrs, class_names) = get_highlight_names(&mut config);
-    (config, html_attrs, class_names)
+    let (injections, html_attrs, class_names) = build_config_with_regex(&mut config);
+    (config, html_attrs, class_names, injections)
   };
 
-  static ref TSX_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
+  static ref TSX_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>, HashMap<&'static str, HighlightConfiguration>) = {
     let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
     highlights.push_str(tree_sitter_typescript::HIGHLIGHT_QUERY);
     highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
@@ -73,11 +74,11 @@ lazy_static! {
       &locals,
     ).unwrap();
 
-    let (html_attrs, class_names) = get_highlight_names(&mut config);
-    (config, html_attrs, class_names)
+    let (injections, html_attrs, class_names) = build_config_with_regex(&mut config);
+    (config, html_attrs, class_names, injections)
   };
 
-  static ref CSS_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>) = {
+  static ref CSS_CONFIG: (HighlightConfiguration, Vec<String>, Vec<String>, HashMap<&'static str, HighlightConfiguration>) = {
     let mut config = HighlightConfiguration::new(
       tree_sitter_css::language(),
       tree_sitter_css::HIGHLIGHTS_QUERY,
@@ -85,19 +86,24 @@ lazy_static! {
       "",
     ).unwrap();
 
-    let (html_attrs, class_names) = get_highlight_names(&mut config);
-    (config, html_attrs, class_names)
+    let mut highlight_names = Vec::new();
+    add_highlight_names(&config, &mut highlight_names);
+    config.configure(&highlight_names);
+
+    let (html_attrs, class_names) = get_attrs(&highlight_names);
+    (config, html_attrs, class_names, HashMap::new())
   };
 }
 
-fn get_highlight_names(config: &mut HighlightConfiguration) -> (Vec<String>, Vec<String>) {
-  let mut highlight_names = Vec::new();
+fn add_highlight_names(config: &HighlightConfiguration, highlight_names: &mut Vec<String>) {
   for name in config.query.capture_names() {
-    highlight_names.push(name.clone());
+    if !highlight_names.contains(name) {
+      highlight_names.push(name.clone());
+    }
   }
+}
 
-  config.configure(&highlight_names);
-
+fn get_attrs(highlight_names: &Vec<String>) -> (Vec<String>, Vec<String>) {
   let html_attrs: Vec<String> = highlight_names
     .iter()
     .map(|s| format!("class=\"{}\"", s.replace('.', " ")))
@@ -111,8 +117,29 @@ fn get_highlight_names(config: &mut HighlightConfiguration) -> (Vec<String>, Vec
   (html_attrs, class_names)
 }
 
-fn load_language<'a>(language: Language) -> (&'a HighlightConfiguration, &'a Vec<String>, &'a Vec<String>) {
-  let (config, html_attrs, class_names) = match language {
+fn build_config_with_regex(config: &mut HighlightConfiguration) -> (HashMap<&'static str, HighlightConfiguration>, Vec<String>, Vec<String>) {
+  let mut highlight_names = Vec::new();
+  add_highlight_names(config, &mut highlight_names);
+
+  let mut regex_config = HighlightConfiguration::new(
+    tree_sitter_regex::language(),
+    tree_sitter_regex::HIGHLIGHTS_QUERY,
+    "",
+    "",
+  ).unwrap();
+  add_highlight_names(&regex_config, &mut highlight_names);
+
+  config.configure(&highlight_names);
+  regex_config.configure(&highlight_names);
+
+  let (html_attrs, class_names) = get_attrs(&highlight_names);
+  let mut injections = HashMap::new();
+  injections.insert("regex", regex_config);
+  (injections, html_attrs, class_names)
+}
+
+fn load_language<'a>(language: Language) -> (&'a HighlightConfiguration, &'a Vec<String>, &'a Vec<String>, &'a HashMap<&'static str, HighlightConfiguration>) {
+  let (config, html_attrs, class_names, injections) = match language {
     Language::JS => &*JS_CONFIG,
     Language::JSX => &*JSX_CONFIG,
     Language::TS => &*TS_CONFIG,
@@ -120,18 +147,18 @@ fn load_language<'a>(language: Language) -> (&'a HighlightConfiguration, &'a Vec
     Language::CSS => &*CSS_CONFIG
   };
 
-  (&config, &html_attrs, &class_names)
+  (&config, &html_attrs, &class_names, &injections)
 }
 
 #[napi]
 fn highlight(code: String, language: Language) -> String {
-  let (config, html_attrs, _) = load_language(language);
+  let (config, html_attrs, _, injections) = load_language(language);
   let mut highlighter = Highlighter::new();
   let highlights = highlighter.highlight(
     &config,
     code.as_bytes(),
     None,
-    |_| None
+    |lang| injections.get(lang)
   ).unwrap();
 
   let mut renderer = HtmlRenderer::new();
@@ -165,13 +192,13 @@ struct HastTextNode {
 
 #[napi]
 fn highlight_hast(code: String, language: Language) -> HastNode {
-  let (config, _, class_names) = load_language(language);
+  let (config, _, class_names, injections) = load_language(language);
   let mut highlighter = Highlighter::new();
   let highlights = highlighter.highlight(
     &config,
     code.as_bytes(),
     None,
-    |_| None
+    |lang| injections.get(lang)
   ).unwrap();
 
   let mut stack = Vec::new();
