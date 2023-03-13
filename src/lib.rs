@@ -18,6 +18,7 @@ pub enum Language {
     PYTHON,
     JAVA,
     C,
+    JSON,
 }
 macro_rules! config {
     ($i:ident, $c:ident) => {
@@ -45,6 +46,7 @@ config!(TOML_CONFIG, tree_sitter_toml);
 config!(JAVA_CONFIG, tree_sitter_java);
 config!(PYTHON_CONFIG, tree_sitter_python);
 config!(C_CONFIG, tree_sitter_c);
+config!(JSON_CONFIG, tree_sitter_json);
 
 lazy_static! {
     static ref JS_CONFIG: (
@@ -246,6 +248,7 @@ fn load_language<'a>(
         Language::JAVA => &*JAVA_CONFIG,
         Language::PYTHON => &*PYTHON_CONFIG,
         Language::C => &*C_CONFIG,
+        Language::JSON => &*JSON_CONFIG,
     };
 
     (&config, &html_attrs, &class_names, &injections)
