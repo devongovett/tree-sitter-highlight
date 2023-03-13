@@ -11,6 +11,13 @@ crate-type = ["cdylib"]
 tree-sitter-highlight = "0.20"
 tree-sitter-javascript = "0.20"
 tree-sitter-typescript = "0.20"
+tree-sitter-go = "0.19.1"
+tree-sitter-rust = "0.20.3"
+tree-sitter-toml = "0.20.0"
+tree-sitter-nix = "0.0.1"
+tree-sitter-python = "0.20.2"
+tree-sitter-java = "0.20.0"
+tree-sitter-c = "0.20.2"
 tree-sitter-css = { git = "https://github.com/devongovett/tree-sitter-css" }
 tree-sitter-regex = { git = "https://github.com/devongovett/tree-sitter-regex" }
 napi = "2"
