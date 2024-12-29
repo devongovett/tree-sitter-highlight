@@ -29,6 +29,26 @@ fn main() {
         tree_sitter_regex::HIGHLIGHTS_QUERY,
         &mut highlight_names,
     );
+    add_highlight_names(
+        tree_sitter_jsdoc::LANGUAGE.into(),
+        tree_sitter_jsdoc::HIGHLIGHTS_QUERY,
+        &mut highlight_names,
+    );
+    add_highlight_names(
+        tree_sitter_json::LANGUAGE.into(),
+        tree_sitter_json::HIGHLIGHTS_QUERY,
+        &mut highlight_names,
+    );
+    add_highlight_names(
+        tree_sitter_yaml::LANGUAGE.into(),
+        tree_sitter_yaml::HIGHLIGHTS_QUERY,
+        &mut highlight_names,
+    );
+    add_highlight_names(
+        tree_sitter_html::LANGUAGE.into(),
+        tree_sitter_html::HIGHLIGHTS_QUERY,
+        &mut highlight_names,
+    );
 
     highlight_names.sort();
 
