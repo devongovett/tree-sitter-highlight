@@ -3,9 +3,9 @@
 
 
 "@napi-rs/cli@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@napi-rs/cli/-/cli-2.1.0.tgz#c0d34051e7488d6e7f2ffd14ba06909fa68b491d"
-  integrity sha512-1qXXjODcXqYsBQcmIFxlsg8yh2JDRPg/GJryDxXFOu8L2tscmVPGiPgSfEX3MI1r7jPUxVePKk/Gbv9k22fASw==
+  version "2.18.4"
+  resolved "https://registry.yarnpkg.com/@napi-rs/cli/-/cli-2.18.4.tgz#12bebfb7995902fa7ab43cc0b155a7f5a2caa873"
+  integrity sha512-SgJeA4df9DE2iAEpr3M2H0OKl/yjtg1BnRI5/JyowS71tUWhrfSu2LT0V3vlHET+g1hBVlrO60PmEXwUEKp8Mg==
 
 tiny-benchy@^2.1.0:
   version "2.1.0"
