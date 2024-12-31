@@ -52,11 +52,6 @@ fn main() {
 
     highlight_names.sort();
 
-    let html_attrs: Vec<String> = highlight_names
-        .iter()
-        .map(|s| format!("class=\"{}\"", s.replace('.', " ")))
-        .collect();
-
     let class_names: Vec<String> = highlight_names
         .iter()
         .map(|s| s.replace('.', " "))
@@ -65,9 +60,8 @@ fn main() {
     std::fs::write(
         "src/highlight_names.rs",
         format!(
-            "pub const HIGHLIGHT_NAMES: &[&str] = &{:#?};\n\npub const HTML_ATTRS: &[&str] = &{:#?};\n\npub const CLASS_NAMES: &[&str] = &{:#?};\n",
+            "use napi_derive::napi;\n\n#[napi]\npub const HIGHLIGHT_NAMES: &[&str] = &{:#?};\n\npub const CLASS_NAMES: &[&str] = &{:#?};\n",
             highlight_names,
-            html_attrs,
             class_names
         ),
     )
