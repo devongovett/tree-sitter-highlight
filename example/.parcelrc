@@ -1,0 +1,6 @@
+{
+  "extends": "@parcel/config-react-static",
+  "transformers": {
+    "*.node": ["@parcel/transformer-raw"]
+  }
+}
