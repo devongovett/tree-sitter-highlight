@@ -1,6 +1,4 @@
 /target
 node_modules
 Cargo.lock
-index.js
-index.d.ts
 *.node
