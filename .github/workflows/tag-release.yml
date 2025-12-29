@@ -37,11 +37,9 @@ jobs:
     name: linux-gnu-x64
     runs-on: ubuntu-latest
     container:
-      image: node:20-slim
+      image: node:20
     steps:
       - uses: actions/checkout@v1
-      - name: Install curl
-        run: sudo apt-get update && sudo apt-get install -y curl
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -122,7 +120,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install build tools
-        run: apk add --no-cache python3 make gcc g++ musl-dev curl
+        run: apk add --no-cache python3 make gcc g++ musl-dev curl tar
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -133,8 +131,8 @@ jobs:
       - name: Install cross compile toolchains
         if: ${{ matrix.target == 'aarch64-unknown-linux-musl' }}
         run: |
-          curl -O https://musl.cc/aarch64-linux-musl-cross.tgz
-          tar xzf aarch64-linux-musl-cross.tgz
+          curl -L -O https://github.com/devongovett/linux-musl-cross/releases/download/v1/aarch64-linux-musl-cross.tgz
+          tar -xzf aarch64-linux-musl-cross.tgz
           cp -R aarch64-linux-musl-cross/* /usr
       - uses: bahmutov/npm-install@v1.1.0
       - name: Build native packages
