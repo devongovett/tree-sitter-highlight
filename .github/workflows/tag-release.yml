@@ -198,7 +198,9 @@ jobs:
         with:
           path: artifacts
       - name: Move artifacts
-        run: mv artifacts/*/*.node .
+        run: |
+          rm -f *.node
+          mv artifacts/*/*.node .
       - name: Debug
         run: ls -l ./*.node
       - run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
