@@ -4,13 +4,9 @@ on:
     types: [published]
   workflow_dispatch:
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest, windows-latest]
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  build-windows:
+    name: windows
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
       - name: Install Rust
@@ -22,13 +18,10 @@ jobs:
       - uses: bahmutov/npm-install@v1.1.0
       - name: Build native packages
         run: yarn build-release
-      - name: Strip debug symbols # https://github.com/rust-lang/rust/issues/46034
-        if: ${{ matrix.os == 'macos-latest' }}
-        run: strip -x ./*.node # Must use -x on macOS. This produces larger results on linux.
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-${{ matrix.os }}
+          name: bindings-windows
           path: ./*.node
       - name: Smoke test
         run: node -e "require('./')"
@@ -150,8 +143,16 @@ jobs:
         if: ${{ matrix.target == 'x86_64-unknown-linux-musl' }}
         run: node -e 'require("./")'
 
-  build-apple-silicon:
-    name: aarch64-apple-darwin
+  build-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: aarch64-apple-darwin
+            target: aarch64-apple-darwin
+          - name: x86_64-apple-darwin
+            target: x86_64-apple-darwin
+    name: ${{ matrix.name }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
@@ -161,7 +162,7 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-          target: aarch64-apple-darwin
+          target: ${{ matrix.target }}
       - uses: bahmutov/npm-install@v1.1.0
       - name: Build native packages
         run: |
@@ -170,14 +171,14 @@ jobs:
           export CXX=$(xcrun -f clang++);
           SYSROOT=$(xcrun --sdk macosx --show-sdk-path);
           export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
-          export JEMALLOC_SYS_WITH_LG_PAGE=14;
-          yarn build-release --target aarch64-apple-darwin
+          export MACOSX_DEPLOYMENT_TARGET="10.9";
+          yarn build-release --target ${{ matrix.target }}
       - name: Strip debug symbols
         run: strip -x ./*.node
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-apple-aarch64
+          name: bindings-${{ matrix.target }}
           path: ./*.node
       - name: debug
         run: ls -l ./*.node
@@ -186,10 +187,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and release the tagged version
     needs:
-      - build
+      - build-windows
       - build-linux-musl
       - build-linux-gnu-arm
-      - build-apple-silicon
+      - build-macos
     steps:
       - uses: actions/checkout@v1
       - uses: bahmutov/npm-install@v1.1.0
@@ -198,9 +199,7 @@ jobs:
         with:
           path: artifacts
       - name: Move artifacts
-        run: |
-          rm -f *.node
-          mv artifacts/*/*.node .
+        run: mv artifacts/*/*.node .
       - name: Debug
         run: ls -l ./*.node
       - run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
