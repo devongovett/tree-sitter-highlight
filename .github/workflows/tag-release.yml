@@ -37,7 +37,7 @@ jobs:
     name: linux-gnu-x64
     runs-on: ubuntu-latest
     container:
-      image: docker.io/centos/nodejs-12-centos7
+      image: node:20-slim
     steps:
       - uses: actions/checkout@v1
       - name: Install yarn
@@ -124,10 +124,7 @@ jobs:
     name: ${{ matrix.target }}
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_TOKEN }}
+      image: node:20-alpine
     steps:
       - uses: actions/checkout@v1
       - name: Install build tools
