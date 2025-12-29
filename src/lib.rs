@@ -18,26 +18,24 @@ pub enum Language {
     HTML,
     Regex,
     JsDoc,
+    C,
+    Bash,
+    Rust,
 }
 
 macro_rules! language {
-    ($mod: ident, $name: literal) => {{
-        let mut config = HighlightConfiguration::new(
-            $mod::LANGUAGE.into(),
-            $name,
-            $mod::HIGHLIGHTS_QUERY,
-            "",
-            "",
-        )
-        .unwrap();
+    ($mod: ident, $name: literal, $highlights: ident) => {{
+        let mut config =
+            HighlightConfiguration::new($mod::LANGUAGE.into(), $name, $mod::$highlights, "", "")
+                .unwrap();
         config.configure(HIGHLIGHT_NAMES);
         config
     }};
-    ($mod: ident, $name: literal, $injections: ident) => {{
+    ($mod: ident, $name: literal, $highlights: ident, $injections: ident) => {{
         let mut config = HighlightConfiguration::new(
             $mod::LANGUAGE.into(),
             $name,
-            $mod::HIGHLIGHTS_QUERY,
+            $mod::$highlights,
             $mod::$injections,
             "",
         )
@@ -115,13 +113,23 @@ lazy_static! {
         config.configure(HIGHLIGHT_NAMES);
         config
     };
-    static ref JSDOC_CONFIG: HighlightConfiguration = language!(tree_sitter_jsdoc, "jsdoc");
-    static ref JSON_CONFIG: HighlightConfiguration = language!(tree_sitter_json, "json");
-    static ref YAML_CONFIG: HighlightConfiguration = language!(tree_sitter_yaml, "yaml");
-    static ref CSS_CONFIG: HighlightConfiguration = language!(tree_sitter_css, "css");
+    static ref JSDOC_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_jsdoc, "jsdoc", HIGHLIGHTS_QUERY);
+    static ref JSON_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_json, "json", HIGHLIGHTS_QUERY);
+    static ref YAML_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_yaml, "yaml", HIGHLIGHTS_QUERY);
+    static ref CSS_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_css, "css", HIGHLIGHTS_QUERY);
     static ref HTML_CONFIG: HighlightConfiguration =
         language!(tree_sitter_html, "html", INJECTIONS_QUERY);
-    static ref REGEX_CONFIG: HighlightConfiguration = language!(tree_sitter_regex, "regex");
+    static ref REGEX_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_regex, "regex", HIGHLIGHTS_QUERY);
+    static ref C_CONFIG: HighlightConfiguration = language!(tree_sitter_c, "c", HIGHLIGHT_QUERY);
+    static ref BASH_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_bash, "bash", HIGHLIGHT_QUERY);
+    static ref RUST_CONFIG: HighlightConfiguration =
+        language!(tree_sitter_rust, "rust", HIGHLIGHTS_QUERY);
 }
 
 impl Language {
@@ -137,6 +145,9 @@ impl Language {
             Language::HTML => &*HTML_CONFIG,
             Language::Regex => &*REGEX_CONFIG,
             Language::JsDoc => &*JSDOC_CONFIG,
+            Language::C => &*C_CONFIG,
+            Language::Bash => &*BASH_CONFIG,
+            Language::Rust => &*RUST_CONFIG,
         }
     }
 
@@ -152,6 +163,11 @@ impl Language {
             "html" => Language::HTML,
             "regex" => Language::Regex,
             "jsdoc" => Language::JsDoc,
+            "c" => Language::C,
+            "bash" => Language::Bash,
+            "sh" => Language::Bash,
+            "rust" => Language::Rust,
+            "rs" => Language::Rust,
             _ => return None,
         })
     }
@@ -169,8 +185,8 @@ pub fn highlight(code: String, language: Language) -> String {
 
     let mut renderer = HtmlRenderer::new();
     renderer
-        .render(highlights, code.as_bytes(), &|highlight| {
-            HTML_ATTRS[highlight.0].as_bytes()
+        .render(highlights, code.as_bytes(), &|highlight, res| {
+            res.extend_from_slice(HTML_ATTRS[highlight.0].as_bytes())
         })
         .unwrap();
     unsafe { String::from_utf8_unchecked(renderer.html) }

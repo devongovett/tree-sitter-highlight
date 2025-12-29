@@ -49,6 +49,21 @@ fn main() {
         tree_sitter_html::HIGHLIGHTS_QUERY,
         &mut highlight_names,
     );
+    add_highlight_names(
+        tree_sitter_c::LANGUAGE.into(),
+        tree_sitter_c::HIGHLIGHT_QUERY,
+        &mut highlight_names,
+    );
+    add_highlight_names(
+        tree_sitter_bash::LANGUAGE.into(),
+        tree_sitter_bash::HIGHLIGHT_QUERY,
+        &mut highlight_names,
+    );
+    add_highlight_names(
+        tree_sitter_rust::LANGUAGE.into(),
+        tree_sitter_rust::HIGHLIGHTS_QUERY,
+        &mut highlight_names,
+    );
 
     highlight_names.sort();
 
