@@ -40,8 +40,6 @@ jobs:
       image: node:20-slim
     steps:
       - uses: actions/checkout@v1
-      - name: Install yarn
-        run: npm install --global yarn@1
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
