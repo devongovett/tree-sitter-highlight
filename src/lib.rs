@@ -1,9 +1,9 @@
 mod highlight_names;
 
 use highlight_names::{CLASS_NAMES, HIGHLIGHT_NAMES, HTML_ATTRS};
-use lazy_static::lazy_static;
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
+use std::sync::LazyLock;
 use tree_sitter_highlight::{HighlightConfiguration, HighlightEvent, Highlighter, HtmlRenderer};
 
 #[napi]
@@ -45,109 +45,120 @@ macro_rules! language {
     }};
 }
 
-lazy_static! {
-    static ref JS_CONFIG: HighlightConfiguration = {
-        let mut config = HighlightConfiguration::new(
-            tree_sitter_javascript::LANGUAGE.into(),
-            "javascript",
-            tree_sitter_javascript::HIGHLIGHT_QUERY,
-            tree_sitter_javascript::INJECTIONS_QUERY,
-            tree_sitter_javascript::LOCALS_QUERY,
-        )
-        .unwrap();
-        config.configure(HIGHLIGHT_NAMES);
-        config
-    };
-    static ref JSX_CONFIG: HighlightConfiguration = {
-        let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
-        highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
+static JS_CONFIG: LazyLock<HighlightConfiguration> = LazyLock::new(|| {
+    let mut config = HighlightConfiguration::new(
+        tree_sitter_javascript::LANGUAGE.into(),
+        "javascript",
+        tree_sitter_javascript::HIGHLIGHT_QUERY,
+        tree_sitter_javascript::INJECTIONS_QUERY,
+        tree_sitter_javascript::LOCALS_QUERY,
+    )
+    .unwrap();
+    config.configure(HIGHLIGHT_NAMES);
+    config
+});
 
-        let mut config = HighlightConfiguration::new(
-            tree_sitter_javascript::LANGUAGE.into(),
-            "jsx",
-            &highlights,
-            tree_sitter_javascript::INJECTIONS_QUERY,
-            tree_sitter_javascript::LOCALS_QUERY,
-        )
-        .unwrap();
+static JSX_CONFIG: LazyLock<HighlightConfiguration> = LazyLock::new(|| {
+    let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
+    highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
 
-        config.configure(HIGHLIGHT_NAMES);
-        config
-    };
-    static ref TS_CONFIG: HighlightConfiguration = {
-        let mut highlights = tree_sitter_typescript::HIGHLIGHTS_QUERY.to_owned();
-        highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
+    let mut config = HighlightConfiguration::new(
+        tree_sitter_javascript::LANGUAGE.into(),
+        "jsx",
+        &highlights,
+        tree_sitter_javascript::INJECTIONS_QUERY,
+        tree_sitter_javascript::LOCALS_QUERY,
+    )
+    .unwrap();
 
-        let mut locals = tree_sitter_typescript::LOCALS_QUERY.to_owned();
-        locals.push_str(tree_sitter_javascript::LOCALS_QUERY);
+    config.configure(HIGHLIGHT_NAMES);
+    config
+});
 
-        let mut config = HighlightConfiguration::new(
-            tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(),
-            "typescript",
-            &highlights,
-            tree_sitter_javascript::INJECTIONS_QUERY,
-            &locals,
-        )
-        .unwrap();
+static TS_CONFIG: LazyLock<HighlightConfiguration> = LazyLock::new(|| {
+    let mut highlights = tree_sitter_typescript::HIGHLIGHTS_QUERY.to_owned();
+    highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
 
-        config.configure(HIGHLIGHT_NAMES);
-        config
-    };
-    static ref TSX_CONFIG: HighlightConfiguration = {
-        let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
-        highlights.push_str(tree_sitter_typescript::HIGHLIGHTS_QUERY);
-        highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
+    let mut locals = tree_sitter_typescript::LOCALS_QUERY.to_owned();
+    locals.push_str(tree_sitter_javascript::LOCALS_QUERY);
 
-        let mut locals = tree_sitter_typescript::LOCALS_QUERY.to_owned();
-        locals.push_str(tree_sitter_javascript::LOCALS_QUERY);
+    let mut config = HighlightConfiguration::new(
+        tree_sitter_typescript::LANGUAGE_TYPESCRIPT.into(),
+        "typescript",
+        &highlights,
+        tree_sitter_javascript::INJECTIONS_QUERY,
+        &locals,
+    )
+    .unwrap();
 
-        let mut config = HighlightConfiguration::new(
-            tree_sitter_typescript::LANGUAGE_TSX.into(),
-            "tsx",
-            &highlights,
-            tree_sitter_javascript::INJECTIONS_QUERY,
-            &locals,
-        )
-        .unwrap();
+    config.configure(HIGHLIGHT_NAMES);
+    config
+});
 
-        config.configure(HIGHLIGHT_NAMES);
-        config
-    };
-    static ref JSDOC_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_jsdoc, "jsdoc", HIGHLIGHTS_QUERY);
-    static ref JSON_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_json, "json", HIGHLIGHTS_QUERY);
-    static ref YAML_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_yaml, "yaml", HIGHLIGHTS_QUERY);
-    static ref CSS_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_css, "css", HIGHLIGHTS_QUERY);
-    static ref HTML_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_html, "html", INJECTIONS_QUERY);
-    static ref REGEX_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_regex, "regex", HIGHLIGHTS_QUERY);
-    static ref C_CONFIG: HighlightConfiguration = language!(tree_sitter_c, "c", HIGHLIGHT_QUERY);
-    static ref BASH_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_bash, "bash", HIGHLIGHT_QUERY);
-    static ref RUST_CONFIG: HighlightConfiguration =
-        language!(tree_sitter_rust, "rust", HIGHLIGHTS_QUERY);
-}
+static TSX_CONFIG: LazyLock<HighlightConfiguration> = LazyLock::new(|| {
+    let mut highlights = tree_sitter_javascript::JSX_HIGHLIGHT_QUERY.to_owned();
+    highlights.push_str(tree_sitter_typescript::HIGHLIGHTS_QUERY);
+    highlights.push_str(tree_sitter_javascript::HIGHLIGHT_QUERY);
+
+    let mut locals = tree_sitter_typescript::LOCALS_QUERY.to_owned();
+    locals.push_str(tree_sitter_javascript::LOCALS_QUERY);
+
+    let mut config = HighlightConfiguration::new(
+        tree_sitter_typescript::LANGUAGE_TSX.into(),
+        "tsx",
+        &highlights,
+        tree_sitter_javascript::INJECTIONS_QUERY,
+        &locals,
+    )
+    .unwrap();
+
+    config.configure(HIGHLIGHT_NAMES);
+    config
+});
+
+static JSDOC_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_jsdoc, "jsdoc", HIGHLIGHTS_QUERY));
+
+static JSON_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_json, "json", HIGHLIGHTS_QUERY));
+
+static YAML_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_yaml, "yaml", HIGHLIGHTS_QUERY));
+
+static CSS_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_css, "css", HIGHLIGHTS_QUERY));
+
+static HTML_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_html, "html", INJECTIONS_QUERY));
+
+static REGEX_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_regex, "regex", HIGHLIGHTS_QUERY));
+
+static C_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_c, "c", HIGHLIGHT_QUERY));
+
+static BASH_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_bash, "bash", HIGHLIGHT_QUERY));
+
+static RUST_CONFIG: LazyLock<HighlightConfiguration> =
+    LazyLock::new(|| language!(tree_sitter_rust, "rust", HIGHLIGHTS_QUERY));
 
 impl Language {
     fn highlight_config(&self) -> &'static HighlightConfiguration {
         match self {
-            Language::JS => &*JS_CONFIG,
-            Language::JSX => &*JSX_CONFIG,
-            Language::TS => &*TS_CONFIG,
-            Language::TSX => &*TSX_CONFIG,
-            Language::JSON => &*JSON_CONFIG,
-            Language::YAML => &*YAML_CONFIG,
-            Language::CSS => &*CSS_CONFIG,
-            Language::HTML => &*HTML_CONFIG,
-            Language::Regex => &*REGEX_CONFIG,
-            Language::JsDoc => &*JSDOC_CONFIG,
-            Language::C => &*C_CONFIG,
-            Language::Bash => &*BASH_CONFIG,
-            Language::Rust => &*RUST_CONFIG,
+            Language::JS => &JS_CONFIG,
+            Language::JSX => &JSX_CONFIG,
+            Language::TS => &TS_CONFIG,
+            Language::TSX => &TSX_CONFIG,
+            Language::JSON => &JSON_CONFIG,
+            Language::YAML => &YAML_CONFIG,
+            Language::CSS => &CSS_CONFIG,
+            Language::HTML => &HTML_CONFIG,
+            Language::Regex => &REGEX_CONFIG,
+            Language::JsDoc => &JSDOC_CONFIG,
+            Language::C => &C_CONFIG,
+            Language::Bash => &BASH_CONFIG,
+            Language::Rust => &RUST_CONFIG,
         }
     }
 
@@ -178,7 +189,7 @@ pub fn highlight(code: String, language: Language) -> String {
     let config = language.highlight_config();
     let mut highlighter = Highlighter::new();
     let highlights = highlighter
-        .highlight(&config, code.as_bytes(), None, |lang| {
+        .highlight(config, code.as_bytes(), None, |lang| {
             Language::from_name(lang).map(|l| l.highlight_config())
         })
         .unwrap();
@@ -221,7 +232,7 @@ pub fn highlight_hast(code: String, language: Language) -> HastNode {
     let config = language.highlight_config();
     let mut highlighter = Highlighter::new();
     let highlights = highlighter
-        .highlight(&config, code.as_bytes(), None, |lang| {
+        .highlight(config, code.as_bytes(), None, |lang| {
             Language::from_name(lang).map(|l| l.highlight_config())
         })
         .unwrap();
