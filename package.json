@@ -1,6 +1,7 @@
 {
   "name": "tree-sitter-highlight",
   "version": "1.1.2",
+  "type": "module",
   "description": "A syntax highlighter for Node powered by Tree Sitter. Written in Rust.",
   "repository": "https://github.com/devongovett/tree-sitter-highlight",
   "author": "Devon Govett <devongovett@gmail.com>",
@@ -14,11 +15,11 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "napi build --platform",
-    "build-release": "napi build --platform --release"
+    "build": "napi build --platform --esm",
+    "build-release": "napi build --platform --esm --release"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^3.5.1",
+    "@napi-rs/cli": "^3.6.2",
     "tiny-benchy": "^2.1.0"
   }
 }
