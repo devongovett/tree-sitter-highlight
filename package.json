@@ -2,6 +2,13 @@
   "name": "tree-sitter-highlight",
   "version": "1.1.2",
   "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
   "description": "A syntax highlighter for Node powered by Tree Sitter. Written in Rust.",
   "repository": "https://github.com/devongovett/tree-sitter-highlight",
   "author": "Devon Govett <devongovett@gmail.com>",
