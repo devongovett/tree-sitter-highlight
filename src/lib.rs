@@ -189,7 +189,7 @@ pub fn highlight(code: String, language: Language) -> String {
     let config = language.highlight_config();
     let mut highlighter = Highlighter::new();
     let highlights = highlighter
-        .highlight(config, code.as_bytes(), None, |lang| {
+        .highlight(config, code.as_bytes(), None, None, |lang| {
             Language::from_name(lang).map(|l| l.highlight_config())
         })
         .unwrap();
@@ -232,7 +232,7 @@ pub fn highlight_hast(code: String, language: Language) -> HastNode {
     let config = language.highlight_config();
     let mut highlighter = Highlighter::new();
     let highlights = highlighter
-        .highlight(config, code.as_bytes(), None, |lang| {
+        .highlight(config, code.as_bytes(), None, None, |lang| {
             Language::from_name(lang).map(|l| l.highlight_config())
         })
         .unwrap();
